@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Сервис загрузки файлов</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div id="app">
+        <div class="container">
+            <h1>Сервис загрузки файлов</h1>
+            
+            <div class="input-group">
+                <input 
+                    v-model="url" 
+                    type="text" 
+                    placeholder="Введите ссылку"
+                    @keyup.enter="processUrl"
+                />
+                <button @click="processUrl" :disabled="!url || loading">
+                    Получить
+                </button>
+            </div>
+
+            <div v-if="statusMessage" class="status-card" :class="statusClass">
+                <p>{{ statusMessage }}</p>
+            </div>
+
+            <div v-if="fileReady" class="download-section">
+                <button @click="downloadFile" class="download-btn">
+                    Скачать файл
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
