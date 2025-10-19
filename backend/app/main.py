@@ -14,6 +14,7 @@ from fastapi.staticfiles import StaticFiles
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from backend.app.models import FileStatus
 from . import crud
 from .celery_app import celery_app
 from .database import get_session, init_db
@@ -57,26 +58,42 @@ async def root():
 @app.post("/api/process", response_model=TaskStatusResponse)
 async def process_url(request: URLRequest, db: AsyncSession = Depends(get_session)):
     existing_file = await crud.get_file_by_url(db, request.url)
-    if existing_file and existing_file.status == "completed":
-        logger.info(f"File already processed: {request.url}")
-        return TaskStatusResponse(
-            task_id="",
-            status="completed",
-            result=FileRecordResponse.model_validate(existing_file)
-        )
-
-    file_record = await crud.create_file_record(db, request.url)
-    logger.info(f"Created new file record: {file_record.id}")
+    # если такой файл уже был обработан, но физически отсутствует на диске — перекачать!
+    if existing_file and existing_file.status == FileStatus.completed:
+        if not existing_file.saved_path or not os.path.exists(existing_file.saved_path):
+            # Ставим статус "pending", очищаем saved_path, кидаем задачу заново
+            await crud.update_file_record(
+                db,
+                file_id=existing_file.id,
+                saved_path=None,
+                status=FileStatus.pending
+            )
+            task = celery_app.send_task(
+                "process_file_download",
+                args=[existing_file.id, request.url]
+            )
+            return TaskStatusResponse(
+                task_id=task.id,
+                status=FileStatus.pending
+            )
+        else:
+            return TaskStatusResponse(
+                task_id="",
+                status=FileStatus.completed,
+                result=FileRecordResponse.model_validate(existing_file)
+            )
+    if not existing_file:
+        file_record = await crud.create_file_record(db, request.url)
+    else:
+        file_record = existing_file
 
     task = celery_app.send_task(
         "process_file_download",
         args=[file_record.id, request.url]
     )
-    logger.info(f"Celery Task started: id={task.id}")
-
     return TaskStatusResponse(
         task_id=task.id,
-        status="pending"
+        status=FileStatus.pending
     )
 
 
@@ -90,7 +107,7 @@ async def get_task_status(task_id: str, db: AsyncSession = Depends(get_session))
             file_record = await crud.get_file_by_id(db, result["file_id"])
             return TaskStatusResponse(
                 task_id=task_id,
-                status="completed",
+                status=FileStatus.completed,
                 result=FileRecordResponse.model_validate(file_record)
             )
     return TaskStatusResponse(

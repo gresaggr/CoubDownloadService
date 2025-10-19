@@ -4,13 +4,11 @@ from .database import Base
 
 from enum import Enum as PyEnum
 
-
 class FileStatus(str, PyEnum):
     pending = "pending"
     processing = "processing"
     completed = "completed"
     failed = "failed"
-
 
 class FileRecord(Base):
     __tablename__ = "file_records"
