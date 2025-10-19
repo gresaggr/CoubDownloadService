@@ -1,6 +1,15 @@
-from sqlalchemy import Column, Integer, String, DateTime, Boolean
+from sqlalchemy import Column, Integer, String, DateTime, Enum
 from datetime import datetime
 from .database import Base
+
+from enum import Enum as PyEnum
+
+
+class FileStatus(str, PyEnum):
+    pending = "pending"
+    processing = "processing"
+    completed = "completed"
+    failed = "failed"
 
 
 class FileRecord(Base):
@@ -11,6 +20,6 @@ class FileRecord(Base):
     filename = Column(String, nullable=True)
     download_url = Column(String, nullable=True)
     saved_path = Column(String, nullable=True)
-    status = Column(String, default="pending")
+    status = Column(Enum(FileStatus), default=FileStatus.pending, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
