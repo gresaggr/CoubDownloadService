@@ -21,7 +21,7 @@
 - SQLAlchemy (ORM, асинхронный доступ)
 - Pydantic v2 (валидаторы, схемы)
 - Docker и docker-compose (контейнеризация всех сервисов)
-- httpx
+- httpx (скачивание файла)
 
 ### Frontend
 - Vue.js (SPA на одной странице)
