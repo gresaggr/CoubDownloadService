@@ -47,13 +47,13 @@ def process_file_download(self: Task, file_id: int, coub_url: str):
             db.commit()
             return {"error": "Error extracting url"}
 
-        filename = f"{title}.mp4"
         if not title or not download_url:
             file_record.status = FileStatus.failed
             db.commit()
             logger.error("Missing filename or download_url in response")
             return {"error": "Missing filename or download_url in response"}
 
+        filename = f"{title}.mp4"
         logger.info(f"Download started: {filename} ({download_url})")
         download_response = httpx.get(download_url, timeout=60.0)
         download_response.raise_for_status()
