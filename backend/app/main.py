@@ -14,6 +14,7 @@ from fastapi.staticfiles import StaticFiles
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy import text
 
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
@@ -169,7 +170,7 @@ async def health_check():
 async def db_health_check(db: AsyncSession = Depends(get_session)):
     """Database health check"""
     try:
-        await db.execute("SELECT 1")
+        await db.execute(text("SELECT 1"))
         return {"status": "ok", "database": "connected"}
     except Exception as e:
         logger.error(f"Database health check failed: {e}")

@@ -2,6 +2,7 @@
 
 help:
 	@echo "Доступные команды:"
+	@echo "  rebuild-up           - Остановить, сбилдить, запустить"
 	@echo "  make build        - Собрать Docker образы"
 	@echo "  make up           - Запустить все сервисы"
 	@echo "  make down         - Остановить все сервисы"
@@ -26,6 +27,12 @@ down:
 restart:
 	docker-compose restart
 
+rebuild-up:
+	docker-compose down
+	docker-compose build
+	docker-compose up -d
+	@echo "Сервисы пересобраны и запущены на http://localhost:8000"
+
 logs:
 	docker-compose logs -f
 
@@ -36,7 +43,8 @@ logs-celery:
 	docker-compose logs -f celery_worker
 
 test:
-	pytest backend/tests/ -v
+#  	pytest backend/tests/ -v
+    docker-compose exec backend pytest backend/tests/ -v
 
 test-cov:
 	pytest backend/tests/ --cov=backend.app --cov-report=html --cov-report=term
@@ -81,3 +89,4 @@ celery-status:
 
 celery-inspect:
 	docker-compose exec celery_worker celery -A backend.app.celery_app inspect active
+
