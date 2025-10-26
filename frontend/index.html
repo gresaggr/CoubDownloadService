@@ -3,36 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Сервис загрузки файлов</title>
+    <title>Сервис загрузки Coub видео</title>
+    <meta name="description" content="Быстрая и удобная загрузка видео с Coub">
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
     <div id="app">
         <div class="container">
-            <h1>Сервис загрузки файлов</h1>
-            
+            <header>
+                <h1>Загрузка Coub видео</h1>
+                <p class="subtitle">Введите ссылку на Coub видео для скачивания</p>
+            </header>
+
             <div class="input-group">
-                <input 
-                    v-model="url" 
-                    type="text" 
-                    placeholder="Введите ссылку"
+                <input
+                    v-model="url"
+                    type="text"
+                    placeholder="https://coub.com/view/..."
                     @keyup.enter="processUrl"
+                    :disabled="loading"
+                    class="url-input"
                 />
-                <button @click="processUrl" :disabled="!url || loading">
-                    Получить
+                <button
+                    @click="processUrl"
+                    :disabled="!url || loading"
+                    class="process-btn"
+                >
+                    <span v-if="!loading">Получить</span>
+                    <span v-else class="spinner"></span>
                 </button>
             </div>
 
-            <div v-if="statusMessage" class="status-card" :class="statusClass">
-                <p>{{ statusMessage }}</p>
+            <!-- Прогресс бар -->
+            <div v-if="progress" class="progress-container">
+                <div class="progress-bar">
+                    <div
+                        class="progress-fill"
+                        :style="{width: progress.current + '%'}"
+                    ></div>
+                </div>
+                <p class="progress-text">{{ progress.status }}</p>
             </div>
 
-            <div v-if="fileReady" class="download-section">
-                <button @click="downloadFile" class="download-btn">
-                    Скачать файл
-                </button>
-            </div>
+            <!-- Статус -->
+            <transition name="fade">
+                <div v-if="statusMessage" class="status-card" :class="statusClass">
+                    <p>{{ statusMessage }}</p>
+                    <p v-if="errorDetails" class="error-details">{{ errorDetails }}</p>
+                </div>
+            </transition>
+
+            <!-- Кнопка скачивания -->
+            <transition name="slide-up">
+                <div v-if="fileReady" class="download-section">
+                    <button @click="downloadFile" class="download-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Скачать файл
+                    </button>
+                </div>
+            </transition>
+
+            <footer>
+                <p class="info-text">
+                    Поддерживаются видео до 100 МБ
+                </p>
+            </footer>
         </div>
     </div>
 
