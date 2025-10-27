@@ -212,7 +212,7 @@ MIT License
 
 ## 👥 Authors
 
-Ваше имя - [GitHub](https://github.com/gresaggr)
+[GitHub](https://github.com/gresaggr)
 
 ## 🙏 Acknowledgments
 
