@@ -33,8 +33,6 @@
 ### DevOps
 - **Docker** & **docker-compose** - контейнеризация
 - **pytest** - тестирование
-- **black** - форматирование кода
-- **flake8** & **mypy** - линтинг и type checking
 
 ## 📦 Установка и запуск
 
@@ -76,20 +74,6 @@ docker-compose up -d
 
 ```bash
 make test
-```
-
-### Запуск с покрытием
-
-```bash
-make test-cov
-# Откройте htmlcov/index.html для просмотра отчёта
-```
-
-### Запуск конкретных тестов
-
-```bash
-pytest backend/tests/test_api.py -v
-pytest backend/tests/test_crud.py::TestFileRecordCRUD::test_create_file_record -v
 ```
 
 ### Подготовка тестовой БД
@@ -186,10 +170,6 @@ make logs              # Все сервисы
 make logs-backend      # Только backend
 make logs-celery       # Только Celery
 
-# Линтинг и форматирование
-make lint              # Проверка кода
-make format            # Форматирование black
-
 # Очистка
 make clean             # Удалить временные файлы
 
@@ -225,83 +205,6 @@ make celery-inspect    # Активные задачи
 5. Включите Sentry для мониторинга ошибок
 6. Регулярно обновляйте зависимости
 
-## 📊 Мониторинг
-
-### Health checks
-
-```bash
-curl http://localhost:8000/health
-curl http://localhost:8000/health/db
-curl http://localhost:8000/health/redis
-```
-
-### Celery мониторинг
-
-Раскомментируйте секцию `flower` в `docker-compose.yml` и перезапустите:
-
-```bash
-docker-compose up -d flower
-```
-
-Откройте http://localhost:5555
-
-## 🐛 Troubleshooting
-
-### Проблема: База данных недоступна
-
-```bash
-# Проверьте статус
-docker-compose ps
-
-# Пересоздайте контейнер
-docker-compose down
-docker-compose up -d db
-```
-
-### Проблема: Celery не обрабатывает задачи
-
-```bash
-# Проверьте логи
-make logs-celery
-
-# Перезапустите воркер
-docker-compose restart celery_worker
-```
-
-### Проблема: Файл не скачивается
-
-```bash
-# Проверьте права на директорию
-ls -la ./downloads/
-
-# Создайте директорию если нет
-mkdir -p ./downloads
-chmod 777 ./downloads
-```
-
-## 📈 Производительность
-
-- Асинхронная обработка запросов (FastAPI)
-- Connection pooling для БД
-- Redis для кэширования результатов
-- Celery для параллельной загрузки файлов
-- Оптимизированные Docker образы
-
-## 🤝 Contributing
-
-1. Fork репозитория
-2. Создайте feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit изменения (`git commit -m 'Add amazing feature'`)
-4. Push в branch (`git push origin feature/amazing-feature`)
-5. Откройте Pull Request
-
-### Перед отправкой PR
-
-```bash
-make format    # Отформатируйте код
-make lint      # Проверьте линтером
-make test      # Запустите тесты
-```
 
 ## 📝 License
 
@@ -309,7 +212,7 @@ MIT License
 
 ## 👥 Authors
 
-Ваше имя - [GitHub](https://github.com/yourusername)
+Ваше имя - [GitHub](https://github.com/gresaggr)
 
 ## 🙏 Acknowledgments
 
